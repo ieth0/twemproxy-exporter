@@ -19,7 +19,7 @@ GO_VERSION        ?= $(shell $(GO) version)
 GO_BUILD_PLATFORM ?= $(subst /,-,$(lastword $(GO_VERSION)))
 FIRST_GOPATH      := $(firstword $(subst :, ,$(shell $(GO) env GOPATH)))
 
-PROMU_VERSION ?= 0.2.0
+PROMU_VERSION ?= 0.13.0
 PROMU_URL     := https://github.com/prometheus/promu/releases/download/v$(PROMU_VERSION)/promu-$(PROMU_VERSION).$(GO_BUILD_PLATFORM).tar.gz
 PROMU         := $(FIRST_GOPATH)/bin/promu
 
