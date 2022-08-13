@@ -57,9 +57,10 @@ type exporter struct {
 	endpoint string
 	timeout  time.Duration
 
-	up                 *prometheus.Desc
-	totalConnections   *prometheus.Desc
-	currentConnections *prometheus.Desc // How is this different from activeClientConnections?
+	up                       *prometheus.Desc
+	totalConnections         *prometheus.Desc
+	currentConnections       *prometheus.Desc // Total connections to server for all pools
+	currentClientConnections *prometheus.Desc // Total client connections for all pools
 
 	// Client metrics
 	clientEOF               *prometheus.Desc
@@ -106,6 +107,12 @@ func newExporter(endpoint string, timeout time.Duration) *exporter {
 		currentConnections: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "", "current_connections"),
 			"The current number of connections.",
+			nil,
+			nil,
+		),
+		currentClientConnections: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, "", "current_client_connections"),
+			"The current number client of connections.",
 			nil,
 			nil,
 		),
@@ -243,6 +250,7 @@ func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 
 	ch <- prometheus.MustNewConstMetric(e.totalConnections, prometheus.CounterValue, st.TotalConnections)
 	ch <- prometheus.MustNewConstMetric(e.currentConnections, prometheus.GaugeValue, st.CurrConnections)
+	ch <- prometheus.MustNewConstMetric(e.currentClientConnections, prometheus.GaugeValue, st.CurrClientConnections)
 
 	for poolName, pool := range st.Pools {
 		ch <- prometheus.MustNewConstMetric(e.clientEOF, prometheus.CounterValue, pool.ClientEOF, poolName)
@@ -297,6 +305,7 @@ func (e *exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- e.up
 	ch <- e.totalConnections
 	ch <- e.currentConnections
+	ch <- e.currentClientConnections
 	ch <- e.clientEOF
 	ch <- e.clientErr
 	ch <- e.activeClientConnections

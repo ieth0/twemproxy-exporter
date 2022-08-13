@@ -3,14 +3,15 @@ package main
 import "encoding/json"
 
 type stats struct {
-	Service          string  `json:"service"`
-	Source           string  `json:"source"`
-	Version          string  `json:"version"`
-	Uptime           float64 `json:"uptime"`
-	Timestamp        float64 `json:"timestamp"`
-	TotalConnections float64 `json:"total_connections"`
-	CurrConnections  float64 `json:"curr_connections"`
-	Pools            map[string]*pool
+	Service               string  `json:"service"`
+	Source                string  `json:"source"`
+	Version               string  `json:"version"`
+	Uptime                float64 `json:"uptime"`
+	Timestamp             float64 `json:"timestamp"`
+	TotalConnections      float64 `json:"total_connections"`
+	CurrConnections       float64 `json:"curr_connections"`
+	CurrClientConnections float64 `json:"curr_client_connections"`
+	Pools                 map[string]*pool
 }
 
 func (s *stats) UnmarshalJSON(b []byte) error {
@@ -32,6 +33,8 @@ func (s *stats) UnmarshalJSON(b []byte) error {
 	delete(dat, "total_connections")
 	s.CurrConnections = dat["curr_connections"].(float64)
 	delete(dat, "curr_connections")
+	s.CurrClientConnections = dat["curr_client_connections"].(float64)
+	delete(dat, "curr_client_connections")
 
 	pools := make(map[string]*pool, len(dat))
 	d, err := json.Marshal(dat)
